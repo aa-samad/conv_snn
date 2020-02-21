@@ -32,27 +32,26 @@ parser.add_argument('--evaluate', dest='evaluate', action='store_true', help='ev
 parser.add_argument('--resume', default='', type=str, metavar='PATH', help='path to latest checkpoint (default: none)')
 parser.add_argument('--start-epoch', default=0, type=int, metavar='N', help='manual epoch number (useful on restarts)')
 
+
 def main():
     global arg
     arg = parser.parse_args()
 
-    train_filename = "DVS-CIFAR10/dvs_cifa10_dense_train.pt"
-    test_filename = "DVS-CIFAR10/dvs_cifar10_dense_test.pt"
+    train_filename = "dvs-cifar10/train/"
+    test_filename = "dvs-cifar10/test/"
 
     # kwargs = {'num_workers': 1, 'pin_memory': True}
     train_loader = DataLoader(DVSCifar10(train_filename),
                               batch_size=arg.batch_size,
-                              shuffle=False,
-                              drop_last=False)
+                              shuffle=True)
     
     test_loader = DataLoader(DVSCifar10(test_filename),
                              batch_size=arg.batch_size,
-                             shuffle=False,
-                             drop_last=False)
+                             shuffle=False)
+
 
     #Model
-    model = Spatial_CNN(
-                        nb_epochs=arg.epochs,
+    model = Spatial_CNN(nb_epochs=arg.epochs,
                         lr=arg.lr,
                         batch_size=arg.batch_size,
                         resume=arg.resume,
@@ -64,6 +63,7 @@ def main():
     )
     #Training
     model.run()
+
 
 class Spatial_CNN():
     def __init__(self, nb_epochs, lr, batch_size, resume, start_epoch, evaluate, train_loader, test_loader, test_video):
@@ -82,7 +82,7 @@ class Spatial_CNN():
     def build_model(self):
         print('==> Build model and setup loss and optimizer')
         #build model
-        self.model = spiking_resnet_18(self.image_size, self.batch_size, channel=3).cuda()
+        self.model = spiking_resnet_18(self.image_size, self.batch_size, nb_classes=10, channel=2).cuda()
         #self.model = resnet18(pretrained= True, channel=3).cuda()
         #Loss function and optimizer
         self.criterion = nn.CrossEntropyLoss().cuda()
@@ -97,7 +97,7 @@ class Spatial_CNN():
                 checkpoint = torch.load(self.resume)
                 self.start_epoch = checkpoint['epoch']
                 # self.best_prec1 = checkpoint['best_prec1']
-                self.best_prec1 = 87
+                self.best_prec1 = 30
                 self.model.load_state_dict(checkpoint['state_dict'])
                 self.optimizer.load_state_dict(checkpoint['optimizer'])
                 print("==> loaded checkpoint '{}' (epoch {}) (best_prec1 {})"
@@ -108,10 +108,11 @@ class Spatial_CNN():
             self.epoch = 0
             prec1, val_loss = self.validate_1epoch()
             return
+
     def get_imagesize(self):
         progress = tqdm(self.train_loader)
-        for i, (data_dict, label) in enumerate(progress):
-            batch_size, ch, w, h = data_dict['img1'].size()
+        for i, (data0, label) in enumerate(progress):
+            batch_size, window, ch, w, h = data0.size()
             self.image_size = np.array([w, h])
             self.batch_size = batch_size
             break
@@ -137,12 +138,6 @@ class Spatial_CNN():
                 #lr_scheduler
                 # self.scheduler.step(val_loss)
                 # save model
-                if is_best:
-                    self.best_prec1 = prec1
-                    with open('record/spatial/spatial_video_preds.pickle','wb') as f:
-                        pickle.dump(self.dic_video_level_preds,f)
-                    f.close()
-                
                 save_checkpoint({
                     'epoch': self.epoch,
                     'state_dict': self.model.state_dict(),
@@ -162,27 +157,24 @@ class Spatial_CNN():
         end = time.time()
         # mini-batch training
         progress = tqdm(self.train_loader)
-        print(len(self.train_loader))
-        for i, (data0,label) in enumerate(progress):
+        for i, (data0, label) in enumerate(progress):
             # measure data loading time
             data_time.update(time.time() - end)
-            label = label.cuda(async=True)
-            target_var = Variable(label).cuda()
-            output = self.model(data0.float().cuda())
-            loss = self.criterion(output, target_var)
+            output = self.model(data0.cuda())
+            loss = self.criterion(output, label.view((-1)).cuda())
+
             # measure accuracy and record loss
-            prec1, prec5 = accuracy(output.data, label, topk=(1, 5))
-            losses.update(loss.item(), data.size(0))
-            top1.update(prec1.item(), data.size(0))
-            top5.update(prec5.item(), data.size(0))
+            prec1, prec5 = accuracy(output.data, label.cuda(), topk=(1, 5))
+            losses.update(loss.item(), data0.size(0))
+            top1.update(prec1.item(), data0.size(0))
+            top5.update(prec5.item(), data0.size(0))
 
             # compute gradient and do SGD step
             self.optimizer.zero_grad()
             # loss.backward(retain_graph=True)
             loss.backward()
             # This line is used to prevent the vanishing / exploding gradient problem
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), 0.25)
-        
+            # torch.nn.utils.clip_grad_norm_(self.model.parameters(), 0.25)
             self.optimizer.step()
 
             # measure elapsed time
@@ -202,7 +194,6 @@ class Spatial_CNN():
     def validate_1epoch(self):
         print('==> Epoch:[{0}/{1}][validation stage]'.format(self.epoch, self.nb_epochs))
         batch_time = AverageMeter()
-        losses = AverageMeter()
         top1 = AverageMeter()
         top5 = AverageMeter()
         # switch to evaluate mode
@@ -212,24 +203,23 @@ class Spatial_CNN():
         progress = tqdm(self.test_loader)
         with torch.no_grad():
             for i, (data0, label) in enumerate(progress):
-                label = label.cuda(async=True)
-                output = self.model(data0.float().cuda())
+                output = self.model(data0.cuda)
+                # compute output
                 # measure elapsed time
                 batch_time.update(time.time() - end)
                 end = time.time()
-                # measure accuracy
+                # Calculate pred acc
                 prec1, prec5 = accuracy(output.data, label, topk=(1, 5))
-                top1.update(prec1.item(), data.size(0))
-                top5.update(prec5.item(), data.size(0))
-        
-        info = {'Epoch':[self.epoch],
-                'Batch Time':[round(batch_time.avg,3)],
-                'Data Time':[round(data_time.avg,3)],
-                'Prec@1':[round(top1.avg,4)],
-                'Prec@5':[round(top5.avg,4)],
+                top1.update(prec1.item(), data0.size(0))
+                top5.update(prec5.item(), data0.size(0))
+
+        info = {'Epoch': [self.epoch],
+                'Batch Time': [round(batch_time.avg, 3)],
+                'Prec@1': [round(top1.avg, 4)],
+                'Prec@5': [round(top5.avg, 4)],
                 }
         record_info(info, 'record/spatial/rgb_test.csv','test')
-
+        return True
 
 
 if __name__=='__main__':
