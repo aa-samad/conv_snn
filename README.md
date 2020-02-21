@@ -1,6 +1,6 @@
 # Conv-SNN
 ### Convolutional spiking neural networks (SNN) for spatio-temporal feature extraction
-This paper highlights potentials of Convolutional spiking neural networks and introduces a new architecture to tackle training deep convolutional SNNs.
+This paper highlights potentials of Convolutional spiking neural networks and introduces a new architecture to tackle problems of training a deep convolutional SNNs.
 
 ## Prerequisites
 The Following Setup is tested and working:
