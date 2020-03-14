@@ -1,6 +1,6 @@
 # Conv-SNN
 ### Convolutional spiking neural networks (SNN) for spatio-temporal feature extraction
-This paper highlights potentials of Convolutional spiking neural networks and introduces a new architecture to tackle problems of training a deep convolutional SNNs.
+This paper highlights potentials of Convolutional spiking neural networks and introduces a new architecture to tackle training deep convolutional SNN problems.
 
 ## Prerequisites
 The Following Setup is tested and it is working:
@@ -12,8 +12,8 @@ The Following Setup is tested and it is working:
 ## Data preparation
 - Download CIFAR10-DVS dataset
     + Extract the dataset under DVS-CIFAR10/dvs-cifar10 folder
-    + Use test_dvs.m in matlab to convert events into matrix of ```t, x, y, p``` 
-    + Run ```python3 dvscifar_dataloader.py``` to prepare the dataset
+    + Use test_dvs.m in matlab to convert events into matrix of ```t, x, y, p``` (make sure to adjust the test_dvs.m folder addresses inside the code) 
+    + Run ```python3 dvscifar_dataloader.py``` to prepare the dataset (make sure to have files like dvs-cifar10/airplane/0.mat inside main.py directory)
 
 ## Training & Testing
 - DVS-CIFAR10 model
