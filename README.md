@@ -30,8 +30,11 @@ The solution is to try other torch versions and parameters or contact me / make 
 ## Citing
 Please adequately refer to the papers any time this Work is being used. If you do publish a paper where this Work helped your research, Please cite the following papers in your publications.
 
-	@inproceedings{...,
-	  title={...},
-	  author={...},
-	  year={...},
-	  organization={...}}
+	@misc{samadzadeh2020convolutional,
+            title={Convolutional Spiking Neural Networks for Spatio-Temporal Feature Extraction},
+            author={Ali Samadzadeh and Fatemeh Sadat Tabatabaei Far and Ali Javadi and Ahmad Nickabadi and Morteza Haghir Chehreghani},
+            year={2020},
+            eprint={2003.12346},
+            archivePrefix={arXiv},
+            primaryClass={cs.CV}
+        }
