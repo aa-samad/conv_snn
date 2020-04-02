@@ -17,7 +17,7 @@ The Following Setup is tested and it is working:
     + Run ```python3 dvscifar_dataloader.py``` to prepare the dataset (make sure to have files like dvs-cifar10/airplane/0.mat inside main.py directory)
 
 ## Training & Testing
-- DVS-CIFAR10 model
+- CIFAR10-DVS model
     + Run ```python3 main.py```
 
 
