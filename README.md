@@ -1,7 +1,6 @@
 # Conv-SNN
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/convolutional-spiking-neural-networks-for/event-data-classification-on-cifar10-dvs)](https://paperswithcode.com/sota/event-data-classification-on-cifar10-dvs?p=convolutional-spiking-neural-networks-for)
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/convolutional-spiking-neural-networks-for/image-classification-on-mnist)](https://paperswithcode.com/sota/image-classification-on-mnist?p=convolutional-spiking-neural-networks-for)
-
 ### Convolutional spiking neural networks (SNN) for spatio-temporal feature extraction
 This paper highlights potentials of Convolutional spiking neural networks and introduces a new architecture to tackle training deep convolutional SNN problems.
 
