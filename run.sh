@@ -5,7 +5,6 @@ IMAGE_NAME="denden047/conv_snn"
 
 docker build -t ${IMAGE_NAME} "$CURRENT_PATH"/docker && \
 docker run -it --rm \
-    -u $(id -u):$(id -g) \
     --gpus 1 \
     -v "$CURRENT_PATH":/workdir \
     -w /workdir \
