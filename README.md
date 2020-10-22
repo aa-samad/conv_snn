@@ -10,10 +10,14 @@ The Following Setup is tested and it is working:
 - Cuda>=9.0
 - opencv>=3.4.2
 
+## Docker
+- Set up the environment where all the programs can run
+    + Run ```./run.sh```
+
 ## Data preparation
 - Download CIFAR10-DVS dataset
     + Extract the dataset under DVS-CIFAR10/dvs-cifar10 folder
-    + Use test_dvs.m in matlab to convert events into matrix of ```t, x, y, p``` (make sure to adjust the test_dvs.m folder addresses inside the code) 
+    + Use test_dvs.m in matlab to convert events into matrix of ```t, x, y, p``` (make sure to adjust the test_dvs.m folder addresses inside the code)
     + Run ```python3 dvscifar_dataloader.py``` to prepare the dataset (make sure to have files like dvs-cifar10/airplane/0.mat inside main.py directory)
 
 ## Training & Testing
@@ -25,7 +29,7 @@ The Following Setup is tested and it is working:
     + For each architecture simply run main file with python3
 
 
-- Note: There are problems with training SNNs, such as extreme importance of initialization; Therefore, you may not reach the highest accuracy as mentioned in the paper. 
+- Note: There are problems with training SNNs, such as extreme importance of initialization; Therefore, you may not reach the highest accuracy as mentioned in the paper.
 The solution is to try other torch versions and parameters or contact me / make an issue if you truly need the highest accuracy.
 
 ## Citing
