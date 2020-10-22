@@ -30,9 +30,8 @@ class ActFun(torch.autograd.Function):
 
 
 act_fun = ActFun.apply
+
 # membrane potential update
-
-
 def mem_update(ops, x, mem, spike):
     mem = mem * decay + ops(x)
     spike = act_fun(mem) # act_fun : approximation firing function
@@ -73,7 +72,7 @@ class SCNN(nn.Module):
         # convolutional layers membrane potential and spike memory
         c1_mem = c1_spike = torch.zeros(batch_size * 2, cfg_cnn[0][1], cfg_kernel[0], cfg_kernel[0], device=device)
         c2_mem = c2_spike = torch.zeros(batch_size * 2, cfg_cnn[1][1], cfg_kernel[1], cfg_kernel[1], device=device)
-        
+
         h1_mem = h1_spike = h1_sumspike = torch.zeros(batch_size * 2, cfg_fc[0], device=device)
         h2_mem = h2_spike = h2_sumspike = torch.zeros(batch_size * 2, cfg_fc[1], device=device)
 
