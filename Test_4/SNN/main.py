@@ -39,43 +39,43 @@ for real_epoch in range(num_epochs):
     running_loss = 0
     start_time = time.time()
     for epoch in range(5):
-      for i, (images, labels) in enumerate(train_loader):
-          # --- create zoom-in and zoom-out version of each image
-          images2 = torch.empty((images.shape[0] * 2, 10, images.shape[2], images.shape[3]))
-          labels2 = torch.empty((images.shape[0] * 2), dtype=torch.int64)
-          for j in range(images.shape[0]):
-              img0 = images[j, 0, :, :].numpy()
-              rows, cols = img0.shape
-              for k in range(10):
-                  rand1 = random.randint(0, rows//2)
-                  rand2 = random.randint(0, cols//2)
-                  images2[j * 2, k, :, :] = torch.from_numpy(img0)
-                  images2[j * 2, k, rand1: rand1 + rows//2, rand2: rand2 + cols//2] = 0 
-                  labels2[j * 2] = labels[j]
-                  # cv2.imshow('image', dst)
-                  # cv2.waitKey(100)
-              for k in range(10):
-                  rand1 = random.randint(0, rows//2)
-                  rand2 = random.randint(0, cols//2)
-                  images2[j * 2 + 1, k, :, :] = torch.from_numpy(img0)
-                  images2[j * 2 + 1, k, rand1: rand1 + rows//2, rand2: rand2 + cols//2] = 0 
-                  labels2[j * 2 + 1] = labels[j]
-          # ----
-          snn.zero_grad()
-          optimizer.zero_grad()
+        for i, (images, labels) in enumerate(train_loader):
+            # --- create zoom-in and zoom-out version of each image
+            images2 = torch.empty((images.shape[0] * 2, 10, images.shape[2], images.shape[3]))
+            labels2 = torch.empty((images.shape[0] * 2), dtype=torch.int64)
+            for j in range(images.shape[0]):
+                img0 = images[j, 0, :, :].numpy()
+                rows, cols = img0.shape
+                for k in range(10):
+                    rand1 = random.randint(0, rows//2)
+                    rand2 = random.randint(0, cols//2)
+                    images2[j * 2, k, :, :] = torch.from_numpy(img0)
+                    images2[j * 2, k, rand1: rand1 + rows//2, rand2: rand2 + cols//2] = 0
+                    labels2[j * 2] = labels[j]
+                    # cv2.imshow('image', dst)
+                    # cv2.waitKey(100)
+                for k in range(10):
+                    rand1 = random.randint(0, rows//2)
+                    rand2 = random.randint(0, cols//2)
+                    images2[j * 2 + 1, k, :, :] = torch.from_numpy(img0)
+                    images2[j * 2 + 1, k, rand1: rand1 + rows//2, rand2: rand2 + cols//2] = 0
+                    labels2[j * 2 + 1] = labels[j]
+            # ----
+            snn.zero_grad()
+            optimizer.zero_grad()
 
-          images2 = images2.float().to(device)
-          outputs = snn(images2)
-          labels_ = torch.zeros(batch_size * 2, 10).scatter_(1, labels2.view(-1, 1), 1)
-          loss = criterion(outputs.cpu(), labels_)
-          running_loss += loss.item()
-          loss.backward()
-          optimizer.step()
-          if (i+1) % 100 == 0:
-              print('Real_Epoch [%d/%d], Epoch [%d/%d], Step [%d/%d], Loss: %.5f'
-                      %( real_epoch, num_epochs, epoch, 5, i+1, len(train_dataset)//batch_size, running_loss))
-              running_loss = 0
-              print('Time elasped:', time.time() - start_time)
+            images2 = images2.float().to(device)
+            outputs = snn(images2)
+            labels_ = torch.zeros(batch_size * 2, 10).scatter_(1, labels2.view(-1, 1), 1)
+            loss = criterion(outputs.cpu(), labels_)
+            running_loss += loss.item()
+            loss.backward()
+            optimizer.step()
+            if (i+1) % 100 == 0:
+                print('Real_Epoch [%d/%d], Epoch [%d/%d], Step [%d/%d], Loss: %.5f'
+                        %( real_epoch, num_epochs, epoch, 5, i+1, len(train_dataset)//batch_size, running_loss))
+                running_loss = 0
+                print('Time elasped:', time.time() - start_time)
 
     # ================================== Test ==============================
     correct = 0
@@ -96,7 +96,7 @@ for real_epoch in range(num_epochs):
                     rand1 = random.randint(0, rows//2)
                     rand2 = random.randint(0, cols//2)
                     images2[j * 2, k, :, :] = torch.from_numpy(img0)
-                    images2[j * 2, k,  rand1: rand1 + rows//2, rand2: rand2 + cols//2] = 0 
+                    images2[j * 2, k,  rand1: rand1 + rows//2, rand2: rand2 + cols//2] = 0
                     labels2[j * 2] = labels[j]
                     # cv2.imshow('image', dst)
                     # cv2.waitKey(100)
@@ -104,7 +104,7 @@ for real_epoch in range(num_epochs):
                     rand1 = random.randint(0, rows//2)
                     rand2 = random.randint(0, cols//2)
                     images2[j * 2 + 1, k, :, :] = torch.from_numpy(img0)
-                    images2[j * 2 + 1, k,  rand1: rand1 + rows//2, rand2: rand2 + cols//2] = 0 
+                    images2[j * 2 + 1, k,  rand1: rand1 + rows//2, rand2: rand2 + cols//2] = 0
                     labels2[j * 2 + 1] = labels[j]
             inputs = images2.to(device)
             optimizer.zero_grad()
@@ -114,7 +114,7 @@ for real_epoch in range(num_epochs):
             _, predicted = outputs.cpu().max(1)
 
             # ----- showing confussion matrix -----
-            
+
             cm += confusion_matrix(labels2, predicted)
             # ------ showing some of the predictions -----
             # for image, label in zip(inputs, predicted):
